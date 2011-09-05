@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}список задач{% endblock %}
+{% block content %}
+<style>
+    .status {
+        font-size: 60%;
+        vertical-align: super;
+    }
+    .active{
+        color: #f89406;
+    }
+    .complate{
+        color: green;
+    }
+</style>
+    <div class="row">
+        <h1><a href="{% url tasks_index %}">Проекты</a> → {{ project.name }}</h1>
+    </div>
+    <hr/>
+    <h2>Этапы</h2>
+    <div class="row">
+        <ul>
+            {% for milestone in milestones %}
+                <li>
+                    <h3><a href="#">{{ milestone.name }}</a> <span class="status {{ milestone.status}}">{{ milestone.status_label }}</span></h3>
+                    <div>
+                        Открытых задач: {{ milestone.get_active_tasks_count }}<br/>
+                        Завершенных задач: {{ milestone.complated_task_count }}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

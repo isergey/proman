@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}список задач{% endblock %}
+{% block content %}
+    <div class="row">
+        <ul>
+            {% for project in projects %}
+                <li>
+                    <a href="{% url tasks_project_detail project.pk %}"> {{ project.name }}</a> {{ project.active_miles_count }}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
