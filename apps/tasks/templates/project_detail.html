@@ -22,7 +22,7 @@
         <ul>
             {% for milestone in milestones %}
                 <li>
-                    <h3><a href="#">{{ milestone.name }}</a> <span class="status {{ milestone.status}}">{{ milestone.status_label }}</span></h3>
+                    <h3><a href="{% url tasks_milestone_detail milestone.id %}">{{ milestone.name }}</a> <span class="status {{ milestone.status}}">{{ milestone.status_label }}</span></h3>
                     <div>
                         Открытых задач: {{ milestone.get_active_tasks_count }}<br/>
                         Завершенных задач: {{ milestone.complated_task_count }}

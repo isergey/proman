@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Задача: {{ task.name }}{% endblock %}
+{% block content %}
+
+    <div class="row">
+        <h1>
+            <a href="{% url tasks_index %}">Проекты</a> →
+            <a href="{% url tasks_project_detail task.milestone.project.id %}">{{ task.milestone.project.name }}</a> →
+            <a href="{% url tasks_milestone_detail task.milestone.id %}">{{ task.milestone.name }}</a> →
+            {{ task.name }}</h1>
+    </div>
+    <hr/>
+    <div class="row">
+    <p><b>Дата начала</b>: {{ task.start_date|default_if_none:"не указана" }}</p>
+    <p><b>Дата окончания</b>: {{ task.end_date|default_if_none:"не указана" }}</p>
+    </div>
+    <div class="row">
+    {{ task.descriprion }}
+    </div>
+{% endblock %}

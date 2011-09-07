@@ -6,7 +6,8 @@ from django.db.models.signals import post_save
 
 
 STATUS_CHOISES = (
-    ('active', u'Активен'),
+    ('new', u'Новый'),
+    ('accepted', u'Принят'),
     ('complate', u'Выполнен'),
     ('paused', u'Приостановлен'),
     ('canceled', u'Отменен')
@@ -108,7 +109,7 @@ class Milestone(models.Model):
         return self.task_set.filter(status='complate').count()
 
     def get_active_tasks_count(self):
-        return self.task_set.filter(status='active').count()
+        return self.task_set.filter(models.Q(status='new')|models.Q(status='accepted')).count()
 
     def status_label(self):
         return get_statis_label(self.status)
@@ -123,11 +124,13 @@ class Task(models.Model):
         verbose_name=u'Название задачи',
         unique=True,
         max_length=256,
+        help_text=u"Краткое описание задачи"
     )
 
     descriprion = models.TextField(
         verbose_name=u'Описание задачи',
-        max_length=102400
+        max_length=102400,
+        help_text=u"В формате markdown"
     )
 
     status = models.CharField(
@@ -142,38 +145,48 @@ class Task(models.Model):
         verbose_name=u"Приоритет",
         default=100,
         db_index=True,
+        help_text=u"Приоритет выполнения"
     )
 
     responsible = models.ManyToManyField(
         User,
-        verbose_name=u'Ответственные'
+        verbose_name=u'Ответственные',
+        help_text=u"Пользователи, ответсвенные за выполнение задачи"
     )
 
     start_date = models.DateTimeField(
         verbose_name=u'Дата начала',
+        blank=True, null=True,
         db_index=True,
+        help_text=u"Дата начала работы над задачей"
     )
 
     end_date = models.DateTimeField(
         verbose_name=u'Дата завершения',
+        blank=True, null=True,
         db_index=True,
+        help_text=u"Дата завершения работы над задачей"
     )
 
     depends_from = models.ManyToManyField(
         'self',
         verbose_name=u'Зависит от задач',
-        blank=True, null=True
+        blank=True, null=True,
+        help_text=u"Укажите от каких задач зависит текущая задача"
     )
+    def status_label(self):
+        return get_statis_label(self.status)
 
     def __unicode__(self):
         return unicode(self.milestone) + u': ' + self.name
 
 
 def check_milestone_for_complate(sender, instance, created, **kwargs):
-    active_tasks_count = Task.objects.filter(milestone=instance.milestone, status=u'active').count()
+    active_tasks_count = Task.objects.filter(models.Q(milestone=instance.milestone), models.Q(status=u'new') | models.Q(status=u'accepted')).count()
     print active_tasks_count
     if active_tasks_count > 0: return
     instance.milestone.status = 'complate'
     instance.milestone.save()
 
 post_save.connect(check_milestone_for_complate, sender=Task)
+
